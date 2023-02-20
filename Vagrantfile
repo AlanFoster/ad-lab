@@ -21,7 +21,14 @@ Vagrant.configure("2") do |config|
       # IP Accessible from the host machine
       vm_config.vm.network "private_network", ip: '10.10.10.5'
 
-      vm_config.vm.provision "shell", path: "scripts/windows/dc01.ps1"
+      vm_config.vm.provision(
+        "shell",
+        path: "scripts/windows/dc01.ps1",
+        args: {
+            domain: "demo.local",
+            administrator_password: "vagrant"
+        }.values
+      )
       vm_config.vm.provision "shell", reboot: true
     end
 

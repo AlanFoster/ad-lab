@@ -1,3 +1,11 @@
+param (
+    [parameter(Mandatory=$true)]
+    [string]$domain,
+
+    [parameter(Mandatory=$true)]
+    [string]$administratorPassword
+)
+
 # Enforce best practices in Powershell
 Set-StrictMode -Version 1.0
 # Exit if a cmdlet fails
@@ -26,11 +34,7 @@ Remove-Item -force c:\secpol.cfg -confirm:$false
 #####################################################################################
 
 Write-Host -fore green $ 'Running forest installation'
-
-$safeModeAdministratorPassword = ConvertTo-SecureString "vagrant" -AsPlainText -Force
-
-$domain = "demo.local"
-$netbios = $domain.split('.')[0].ToUpperInvariant()
+$safeModeAdministratorPassword = ConvertTo-SecureString $administratorPassword -AsPlainText -Force
 
 # Set local Administrator account password to stop the error:
 #   "The new domain cannot be created DC01: because the local Administrator account password does not meet requirements."
@@ -56,7 +60,8 @@ Install-WindowsFeature AD-Domain-Services,RSAT-AD-AdminCenter,RSAT-ADDS-Tools -I
 $isDomainController = (Get-WmiObject -Class Win32_operatingSystem).ProductType -Eq 2
 Write-Host -fore green $ 'IsDomainController='$isDomainController
 if (!$isDomainController) {
-    Write-Host -fore green $ 'Installing ADDS'
+    $netbios = $domain.split('.')[0].ToUpperInvariant()
+    Write-Host -fore green $ 'Installing ADDS for domain ' $domain ' and netbios ' $netbios
     Install-ADDSForest `
         -CreateDnsDelegation:$false `
         -DatabasePath "C:\Windows\NTDS" `
