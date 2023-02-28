@@ -8,7 +8,17 @@ vagrant up --provider=virtualbox
 
 At this time only Virtualbox is supported
 
-TODO: Run Vagrant SysPrep new domain joined machines
+## Lab
+
+The current lab set up is:
+
+```mermaid
+flowchart TD
+    DC01[DC01\ndomain: demo.local\n10.10.10.5]
+    DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.10.6]
+
+    DC01 --> DC02
+```
 
 ### Architecture Decisions
 
@@ -34,3 +44,8 @@ Measure-Command { vagrant up | Out-Default }
 - `vagrant halt` - Shuts down any running virtual machines
 - `vagrant reload` - Reload the VM; the equivalent of running a halt followed by an up. Provisioners will not run by default
 - `vagrant destroy` - Destroys the VMs
+- `vagrant plugin list` - View currently installed vagran plugins
+- `vagrant plugin install vagrant-vbguest` - Install plugin to automatically install the host's VirtualBox Guest Additions on the guest system
+- `vagrant plugin uninstall vagrant-vbguest` - Uninstall the vbguest plugin
+
+powershell.exe -file .\dc02-01-install-forest.ps1 -parentDomain demo.local -parentDomainIp 10.10.10.5 -domain dev.demo.local -domainIp 10.10.10.6 -administratorPassword vagrant
