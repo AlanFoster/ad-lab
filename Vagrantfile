@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
       config.vbguest.no_remote = true
     end
 
-    config.vm.define "DC01" do |vm_config|
+    config.vm.define("DC01", autostart: false) do |vm_config|
       vm_config.vm.box = "StefanScherer/windows_2016"
       vm_config.vm.box_version = "2019.02.14"
       vm_config.vm.hostname = "DC01"
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
       vm_config.winrm.basic_auth_only = true
 
       # IP Accessible from the host machine
-      vm_config.vm.network "private_network", ip: '10.10.10.5'
+      vm_config.vm.network "private_network", ip: '10.10.10.5', netmask: '255.255.0.0'
 
       vm_config.vm.provision(
         "shell",
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
       end
     end
 
-    config.vm.define "WS01" do |vm_config|
+    config.vm.define("WS01", autostart: false) do |vm_config|
       vm_config.vm.box = "StefanScherer/windows_2016"
       vm_config.vm.box_version = "2019.02.14"
       vm_config.vm.hostname = "WS01"
@@ -67,7 +67,7 @@ Vagrant.configure("2") do |config|
       vm_config.winrm.basic_auth_only = true
 
       # IP Accessible from the host machine
-      vm_config.vm.network "private_network", ip: '10.10.10.6'
+      vm_config.vm.network "private_network", ip: '10.10.10.6', netmask: '255.255.0.0'
 
       vm_config.vm.provision(
         "shell",
@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
       end
     end
 
-    config.vm.define "DC02" do |vm_config|
+    config.vm.define("DC02", autostart: false) do |vm_config|
       vm_config.vm.box = "StefanScherer/windows_2016"
       vm_config.vm.box_version = "2019.02.14"
       vm_config.vm.hostname = "DC02"
@@ -96,7 +96,7 @@ Vagrant.configure("2") do |config|
       vm_config.winrm.basic_auth_only = true
 
       # IP Accessible from the host machine
-      vm_config.vm.network "private_network", ip: '10.10.11.5'
+      vm_config.vm.network "private_network", ip: '10.10.11.5', netmask: '255.255.0.0'
 
       vm_config.vm.provision(
         "shell",
@@ -108,6 +108,17 @@ Vagrant.configure("2") do |config|
         vm_config.vm.provision("shell", path: "scripts/windows/install-software.ps1")
         vm_config.vm.provision "shell", reboot: true
       end
+    end
+
+    config.vm.define("Kali", autostart: false) do |vm_config|
+      vm_config.vm.box = "kalilinux/rolling"
+      vm_config.vm.box_version = "2022.4.0"
+      vm_config.vm.hostname = "Kali"
+
+      # IP Accessible from the host machine
+      vm_config.vm.network "private_network", ip: '10.10.10.10', netmask: '255.255.0.0'
+
+      vm_config.vm.provision("shell", path: "scripts/kali/kali-01-update-software.sh")
     end
 
     config.vm.provider "virtualbox" do |virtualbox|

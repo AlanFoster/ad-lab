@@ -19,6 +19,8 @@ flowchart RL
 
     DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.11.6]
 
+    Kali[Kali\n10.10.10.10]
+
     style dev.demo.local.padding fill:transparent,stroke:transparent
 
     subgraph demo.local [Domain: demo.local]
@@ -34,7 +36,8 @@ flowchart RL
         end
     end
 
-   dev.demo.local --> demo.local
+   dev.demo.local --> |TrustBy| demo.local
+   demo.local --> |TrustBy| dev.demo.local
 ```
 
 ### Architecture Decisions
