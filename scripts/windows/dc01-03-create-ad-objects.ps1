@@ -33,6 +33,10 @@ $users | ForEach-Object {
     $username = $_.username
     $passwordSecure = ConvertTo-SecureString $_.password -AsPlainText -Force
     $ouPath = $_.ouPath
+    $groups = $_.groups
+    if ($groups -Eq $null) {
+        $groups = @()
+    }
 
     # Either create a new user, or update the existing user's details
     $adUser = Get-ADUser -Filter "Name -Eq '$username'"
@@ -50,5 +54,8 @@ $users | ForEach-Object {
         -NewPassword $passwordSecure
     if ($adUser.DistinguishedName -Ne "CN=$username,$ouPath") {
         $adUser | Move-ADObject -TargetPath $ouPath
+    }
+    $groups | ForEach-Object {
+        Add-ADGroupMember -Identity $_.identity -Members $adUser
     }
 }

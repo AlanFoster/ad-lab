@@ -59,6 +59,7 @@ Measure-Command { vagrant up | Out-Default }
 - `vagrant status` - Display the state of the vagrant environment in the current directory
 - `vagrant up` - Creates and configures your Vagrant environment as defined in your Vagrant file
 - `vagrant halt` - Shuts down any running virtual machines
+- `vagrant validate` - Validate the Vagrantfile
 - `vagrant reload` - Reload the VM; the equivalent of running a halt followed by an up. Provisioners will not run by default
 - `vagrant destroy` - Destroys the VMs
 - `vagrant plugin list` - View currently installed vagran plugins

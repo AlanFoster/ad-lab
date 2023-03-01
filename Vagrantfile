@@ -42,7 +42,7 @@ Vagrant.configure("2") do |config|
 
       vm_config.vm.provision(
         "shell",
-        path: "scripts/windows/dc01-03-add-users.ps1",
+        path: "scripts/windows/dc01-03-create-ad-objects.ps1",
         args: "-hostname DC01 -domain demo.local -domainIp 10.10.10.5 -administratorPassword vagrant"
       )
 

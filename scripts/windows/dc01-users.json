@@ -15,9 +15,21 @@
     },
     {
         "domain": "demo.local",
-        "username": "basic_developer",
+        "username": "developer",
         "password": "vagrant",
         "enabled": true,
         "ouPath": "OU=Developers,OU=UK,DC=demo,DC=local"
+    },
+    {
+        "domain": "demo.local",
+        "username": "web_admin",
+        "password": "vagrant",
+        "enabled": true,
+        "ouPath": "OU=Admins,OU=UK,DC=demo,DC=local",
+        "groups": [
+            {
+                "identity": "CN=Administrators,CN=Builtin,DC=demo,DC=local"
+            }
+        ]
     }
 ]
