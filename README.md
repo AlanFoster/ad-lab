@@ -13,11 +13,28 @@ At this time only Virtualbox is supported
 The current lab set up is:
 
 ```mermaid
-flowchart TD
+flowchart RL
     DC01[DC01\ndomain: demo.local\n10.10.10.5]
-    DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.10.6]
+    WS01[WS01\ndomain:demo.local\n10.10.10.6]
 
-    DC01 --> DC02
+    DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.11.6]
+
+    style dev.demo.local.padding fill:transparent,stroke:transparent
+
+    subgraph demo.local [Domain: demo.local]
+        direction BT
+
+        DC01
+        WS01 --> DC01
+    end
+
+    subgraph dev.demo.local [Child Domain: dev.demo.local]
+        subgraph dev.demo.local.padding [ ]
+            DC02
+        end
+    end
+
+   dev.demo.local --> demo.local
 ```
 
 ### Architecture Decisions

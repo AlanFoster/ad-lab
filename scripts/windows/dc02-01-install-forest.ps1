@@ -1,5 +1,5 @@
 # Example usage:
-# powershell.exe -file .\dc02-01-install-forest.ps1 -parentDomain demo.local -parentDomainIp 10.10.10.5 -domain dev.demo.local -domainIp 10.10.10.6 -administratorPassword vagrant
+# powershell.exe -file .\dc02-01-install-forest.ps1 -parentDomain demo.local -parentDomainIp 10.10.10.5 -domain dev.demo.local -domainIp 10.10.11.6 -administratorPassword vagrant
 param (
     [parameter(Mandatory=$true)]
     [string]$parentDomainIp,
@@ -49,9 +49,9 @@ Remove-Item -force c:\secpol.cfg -confirm:$false
 
 # Add DNS to preference root domain DNS lookup
 #$parentDomainSubnet = $parentDomainIp.Split('.')[0..2] -Join '.'
-$adapters = Get-WmiObject Win32_NetworkAdapterConfiguration # | Where-Object { $_.IPAddress -Match $parentDomainSubnet }
+$adapters = Get-WmiObject "Win32_NetworkAdapterConfiguration where IPEnabled='TRUE'" # | Where-Object { $_.IPAddress -Match $parentDomainSubnet }
 $adapters | ForEach-Object {
-    Write-Host -fore green "[*] Updating network adaptor for $_.IPAddress to resolve DNS to $parentDomainIp"
+    Write-Host -fore green "[*] Updating network adapter for $($_.IPAddress) to resolve DNS to $parentDomainIp"
     $_.SetDNSServerSearchOrder($parentDomainIp)
 }
 

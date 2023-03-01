@@ -1,0 +1,11 @@
+[
+    {
+        "distinguishedName": "OU=UK,DC=demo,DC=local"
+    },
+    {
+        "distinguishedName": "OU=Users,OU=UK,DC=demo,DC=local"
+    },
+    {
+        "distinguishedName": "OU=Developers,OU=UK,DC=demo,DC=local"
+    }
+]

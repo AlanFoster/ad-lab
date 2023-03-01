@@ -1,0 +1,23 @@
+[
+    {
+        "domain": "demo.local",
+        "username": "basic_user",
+        "password": "vagrant",
+        "enabled": true,
+        "ouPath": "OU=Users,OU=UK,DC=demo,DC=local"
+    },
+    {
+        "domain": "demo.local",
+        "username": "disabled_account",
+        "password": "vagrant",
+        "enabled": false,
+        "ouPath": "OU=Users,OU=UK,DC=demo,DC=local"
+    },
+    {
+        "domain": "demo.local",
+        "username": "basic_developer",
+        "password": "vagrant",
+        "enabled": true,
+        "ouPath": "OU=Developers,OU=UK,DC=demo,DC=local"
+    }
+]
