@@ -1,14 +1,19 @@
+# Enforce best practices in Powershell
+Set-StrictMode -Version 1.0
+# Exit if a cmdlet fails
+$ErrorActionPreference = "Stop"
+
 ##################################################################################
 # Choco
 ##################################################################################
+
+Write-Host -fore green '[*] Installing Choco software'
 
 Set-ExecutionPolicy Bypass -Scope Process -Force;
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
 iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-choco install -y nmap
-choco install -y wireshark
-choco install -y googlechrome
+choco install -y --limit-output nmap wireshark googlechrome
 
 ##################################################################################
 # Misc
