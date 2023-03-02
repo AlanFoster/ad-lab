@@ -119,6 +119,7 @@ Vagrant.configure("2") do |config|
       vm_config.vm.network "private_network", ip: '10.10.10.10', netmask: '255.255.0.0'
 
       vm_config.vm.provision("shell", path: "scripts/kali/kali-01-update-software.sh")
+      vm_config.vm.provision("shell", path: "scripts/kali/kali-02-user-setup.sh", privileged: false)
     end
 
     config.vm.provider "virtualbox" do |virtualbox|

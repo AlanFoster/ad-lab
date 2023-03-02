@@ -1,9 +1,15 @@
 ## AD-Lab
 
-Running:
+Bringing a single domain controller up:
 
 ```
-vagrant up --provider=virtualbox
+vagrant up --provider=virtualbox DC01
+```
+
+Bringing all machines up:
+
+```
+vagrant up --provider=virtualbox DC01 WS01 DC02 Kali
 ```
 
 At this time only Virtualbox is supported
@@ -21,8 +27,6 @@ flowchart RL
 
     Kali[Kali\n10.10.10.10]
 
-    style dev.demo.local.padding fill:transparent,stroke:transparent
-
     subgraph demo.local [Domain: demo.local]
         direction BT
 
@@ -31,13 +35,11 @@ flowchart RL
     end
 
     subgraph dev.demo.local [Child Domain: dev.demo.local]
-        subgraph dev.demo.local.padding [ ]
-            DC02
-        end
+        DC02
     end
 
-   dev.demo.local --> |TrustBy| demo.local
-   demo.local --> |TrustBy| dev.demo.local
+   dev.demo.local --> |TrustedBy| demo.local
+   demo.local --> |TrustedBy| dev.demo.local
 ```
 
 ### Architecture Decisions
