@@ -1,0 +1,10 @@
+##################################################################################
+# Infinite zsh command history - Ensure command history always remains
+##################################################################################
+
+# share command history data
+setopt sharehistory
+
+# Note this value is also overriden with sed in the calling script
+export HISTFILESIZE=10000000
+export HISTSIZE=10000000
