@@ -10,5 +10,8 @@
     },
     {
         "distinguishedName": "OU=Admins,OU=UK,DC=demo,DC=local"
+    },
+    {
+        "distinguishedName": "OU=Support,OU=UK,DC=demo,DC=local"
     }
 ]

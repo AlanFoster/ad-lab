@@ -1,3 +1,6 @@
+# Example usage:
+# powershell.exe -file .\dc01-03-create-ad-objects.ps1
+
 # Enforce best practices in Powershell
 Set-StrictMode -Version 1.0
 # Exit if a cmdlet fails
@@ -59,3 +62,19 @@ $users | ForEach-Object {
         Add-ADGroupMember -Identity $_.identity -Members $adUser
     }
 }
+
+##################################################################################
+# RBCD Exploit
+##################################################################################
+
+$TargetComputer = Get-ADComputer -Identity $(hostname)
+$User = Get-ADUser 'sandy'
+
+# Add GenericWrite access to the user against the target computer
+$Rights = [System.DirectoryServices.ActiveDirectoryRights] "GenericWrite"
+$ControlType = [System.Security.AccessControl.AccessControlType] "Allow"
+$InheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance] "All"
+$GenericWriteAce = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $User.Sid, $Rights, $ControlType, $InheritanceType
+$targetComputerAcl = Get-Acl "AD:$($TargetComputer.DistinguishedName)"
+$TargetComputerAcl.AddAccessRule($GenericWriteAce)
+Set-Acl -AclObject $targetComputerAcl -Path "AD:$($TargetComputer.DistinguishedName)"

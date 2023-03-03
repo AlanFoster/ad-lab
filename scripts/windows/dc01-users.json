@@ -31,5 +31,13 @@
                 "identity": "CN=Administrators,CN=Builtin,DC=demo,DC=local"
             }
         ]
+    },
+    {
+        "domain": "demo.local",
+        "username": "sandy",
+        "password": "vagrant",
+        "enabled": true,
+        "ouPath": "OU=Support,OU=UK,DC=demo,DC=local",
+        "groups": []
     }
 ]
