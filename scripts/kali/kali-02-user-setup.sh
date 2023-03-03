@@ -47,13 +47,5 @@ comm -23 <(sort -i "$vagrant_files/.zsh_history") <(sort -i "$user_directory/.zs
 # Terminal configuration
 ##################################################################################
 
-# Support the same navigation shortcuts as iterm, shift+cmd+left and shift+cmd+right for tab navigation
-if [[ ! -e "$user_directory/.config/qterminal.org/qterminal.ini" ]]; then
-    cp /usr/share/kali-themes/etc/xdg/qterminal.org/qterminal.ini "$user_directory/.config/qterminal.org/qterminal.ini"
-fi
-
-idempotent_append "Move%20Tab%20Left=" "$user_directory/.config/qterminal.org/qterminal.ini"
-sed -i 's/Move%20Tab%20Left=.*/Move%20Tab%20Left=Alt+Shift+Left|Ctrl+Shift+PgUp/' "$user_directory/.config/qterminal.org/qterminal.ini"
-
-idempotent_append "Move%20Tab%20Right=" "$user_directory/.config/qterminal.org/qterminal.ini"
-sed -i 's/Move%20Tab%20Right=.*/Move%20Tab%20RightAlt+Shift+Right|Ctrl+Shift+PgDown0/' "$user_directory/.config/qterminal.org/qterminal.ini"
+mkdir -p "$user_directory/.config/qterminal.org" 2>/dev/null || true
+cp -f $vagrant_files/qterminal.ini "$user_directory/.config/qterminal.org/qterminal.ini"

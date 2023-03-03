@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euxo pipefail
 
 # Executes a git pull if the git folder is present, otherwise a git clone is run
 #
