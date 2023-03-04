@@ -12,13 +12,23 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get -q update
 packages=(
+    # Install the latest Kali metasploit-framework release
     metasploit-framework
+    # Install the dependencies for local metasploit-framework development builds
+    autoconf
+    build-essential
+    libpcap-dev
+    libpq-dev
+    zlib1g-dev
+    libsqlite3-dev
     # CrackMapExec - SMB/WinRM/etc enumeration - https://github.com/Porchetta-Industries/CrackMapExec
     cme
     # Active Directory configuration viewer - https://github.com/BloodHoundAD/BloodHound
     bloodhound
     # Web application scanner
     nikto
+    # Visual studio code for file editing
+    code-oss
 )
 apt-get -yq install ${packages[@]}
 

@@ -7,23 +7,41 @@ source $vagrant_files/common.sh
 export user_directory=~
 
 #################################################################################
+# Metasploit setup
+#################################################################################
+
+git_fetch_or_clone https://github.com/rapid7/metasploit-framework $user_directory/metasploit-framework
+idempotent_append '[remote "upstream"]' "$user_directory/metasploit-framework/.git/config"
+idempotent_append '	url = https://github.com/rapid7/metasploit-framework.git' "$user_directory/metasploit-framework/.git/config"
+idempotent_append '	fetch = +refs/heads/*:refs/remotes/upstream/*' "$user_directory/metasploit-framework/.git/config"
+idempotent_append '	fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*' "$user_directory/metasploit-framework/.git/config"
+(
+    cd $user_directory/metasploit-framework
+    bundle
+)
+
+#################################################################################
 # Toolbox - File server, payload/shell generation, and useful tools like linpeas
 #################################################################################
 
-git_pull_or_clone https://github.com/AlanFoster/toolbox.git $user_directory/toolbox
-cd $user_directory/toolbox
-git submodule update --init --recursive
-python3 -m pip install -r requirements.txt
-python3 $user_directory/toolbox/toolbox.py --help
+git_fetch_or_clone https://github.com/AlanFoster/toolbox.git $user_directory/toolbox
+(
+    cd $user_directory/toolbox
+    git submodule update --init --recursive
+    python3 -m pip install -r requirements.txt
+    python3 $user_directory/toolbox/toolbox.py --help
+)
 
 ##################################################################################
 # Dirsearch - Python directory explorer, with recursive searching and wordlist
 ##################################################################################
 
-git_pull_or_clone https://github.com/maurosoria/dirsearch.git $user_directory/dirsearch
-cd $user_directory/dirsearch
-python3 -m pip install -r requirements.txt
-python3 $user_directory/dirsearch/dirsearch.py --help
+git_fetch_or_clone https://github.com/maurosoria/dirsearch.git $user_directory/dirsearch
+(
+    cd $user_directory/dirsearch
+    python3 -m pip install -r requirements.txt
+    python3 $user_directory/dirsearch/dirsearch.py --help
+)
 
 ##################################################################################
 # .zsh_rc configuration
@@ -41,7 +59,7 @@ sed -i 's/SAVEHIST=.*/SAVEHIST=10000000/' "$user_directory/.zshrc"
 # Append any missing history lines to .zsh_history
 touch "$user_directory/.zsh_history"
 chmod 0644 "$user_directory/.zsh_history"
-comm -23 <(sort -i "$vagrant_files/.zsh_history") <(sort -i "$user_directory/.zsh_history") >> "$user_directory/.zsh_history"
+comm -23 <(sort "$vagrant_files/.zsh_history") <(sort "$user_directory/.zsh_history") >> "$user_directory/.zsh_history"
 
 ##################################################################################
 # Terminal configuration
