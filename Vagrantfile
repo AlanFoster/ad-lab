@@ -126,7 +126,20 @@ Vagrant.configure("2") do |config|
     # Display the VirtualBox GUI when booting the machine
     virtualbox.gui = true
 
-    # Customize the amount of memory on the VM:
-    virtualbox.memory = "4096"
+    # You can create a full copy or a linked copy of an existing VM; Linked clones are faster
+    # https://github.com/hashicorp/vagrant/blob/2a22359380738ebc3eed2e4a76c6da966ffed19b/website/content/docs/providers/virtualbox/configuration.mdx#linked-clones
+    virtualbox.linked_clone = true if Gem::Version.new(Vagrant::VERSION) >= Gem::Version.new('1.8.0')
+
+    # By default Vagrant will check for the VirtualBox Guest Additions when starting a machine; skip it
+    # https://github.com/hashicorp/vagrant/blob/2a22359380738ebc3eed2e4a76c6da966ffed19b/website/content/docs/providers/virtualbox/configuration.mdx#checking-for-guest-additions
+    virtualbox.check_guest_additions = false
+
+    # Customize memory and CPUs for faster boot/provisioning time
+    virtualbox.customize [
+      "modifyvm", :id,
+      "--memory", "4096",
+      "--cpus", "2",
+      "--ioapic", "on",
+    ]
   end
 end
