@@ -14,6 +14,18 @@ vagrant up --provider=virtualbox DC01 WS01 DC02 Kali
 
 At this time only Virtualbox is supported
 
+To install additional software such as Chrome/nmap/Wireshark etc:
+
+```
+# Powershell
+$env:INSTALL_SOFTWARE = 'true'
+vagrant provision DC01
+Remove-Item env:INSTALL_SOFTWARE
+
+# Bash
+INSTALL_SOFTWARE=true vagrant provision DC01
+```
+
 ## Lab
 
 The current lab set up is:
@@ -50,7 +62,68 @@ For simplicitly the setup scripts do not use Ansible or Chef. Window's [Desired 
 
 ### Testing
 
-Using inspec
+Currently [Chef's InSpec](https://github.com/inspec/inspec) is used to test the provisioned infrastructure. This test suite connects to the running environments and verifies key components such as user/folders/applications/etc being in the expected state.
+
+```
+# Installing and running on Linux with Ruby installed previously
+bundle
+bundle exec inspec
+
+# Fresh windows installation
+. { iwr -useb https://omnitruck.chef.io/install.ps1 } | iex; install -project inspec
+inspec
+```
+
+Running tests:
+
+```
+# DC01
+bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc01_spec.rb
+# DC02
+bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc02_spec.rb
+# Kali
+bundle exec inspec exec -t ssh://vagrant@10.10.10.10 --password vagrant ./spec/kali_spec.rb
+```
+
+When developing inspec tests you can enter into an interactive repl / shell:
+
+```
+# Windows DC01 example
+bundle inspec shell -t winrm://Administrator@10.10.10.5 --password vagrant
+
+# Kali example
+bundle inspec shell -t ssh://vagrant@10.10.10.10 --password vagrant
+```
+
+In the interactive inspec shell view all available resources with `help resources`, or view the details about an individual resource with `help file` etc.
+
+Example test run:
+
+```
+$ bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc01_spec.rb
+
+Profile:   tests from ./spec/dc01_spec.rb (tests from ..spec.dc01_spec.rb)
+Version:   (not specified)
+Target:    winrm://Administrator@http://10.10.10.5:5985/wsman:3389
+Target ID: 806ac47f-97b0-ec41-9c16-98c790a9473a
+
+  ✔  DC01-Users: User configuration
+     ✔  User demo.local\web_admin is expected to exist
+     ✔  User demo.local\web_admin groups is expected to eq ["Domain Users", "Administrators"]
+     ✔  User demo.local\web_admin maxdays is expected to eq 0
+  ✔  DC01-RBCD-Vulnerablility: RBCD Vulnerability
+     ✔  User demo.local\sandy is expected to exist
+     ✔  User demo.local\sandy groups is expected to eq ["Domain Users"]
+     ✔  User demo.local\sandy maxdays is expected to eq 0
+     ✔  Powershell stdout is expected to include "ActiveDirectoryRights : GenericWrite"
+  ✔  DC01-PasswordExpiration: User password expiration configuration
+     ✔  [] length is expected to eq 0
+  ✔  DC01-DNS: DNS configuration
+     ✔  Host dc01.demo.local is expected to be reachable
+     ✔  Host dc01.demo.local is expected to be resolvable
+     ✔  Host dc01.demo.local ipaddress is expected to include "10.10.10.5"
+     ✔  Host dc02.dev.demo.local ipaddress is expected to be nil
+```
 
 ### Timing
 
