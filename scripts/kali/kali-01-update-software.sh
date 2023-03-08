@@ -29,6 +29,8 @@ packages=(
     nikto
     # Visual studio code for file editing
     code-oss
+    # Copy/paste suport via the command line
+    xsel
 )
 apt-get -yq install ${packages[@]}
 

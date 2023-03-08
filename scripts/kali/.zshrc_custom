@@ -8,3 +8,11 @@ setopt sharehistory
 # Note this value is also overriden with sed in the calling script
 export HISTFILESIZE=10000000
 export HISTSIZE=10000000
+
+##################################################################################
+# Mac shortcuts
+##################################################################################
+
+# Copy to/from paste buffer, i.e. `cat some_file | pbcopy` or `pbpaste > some_file`
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
