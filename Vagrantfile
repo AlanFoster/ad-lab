@@ -1,6 +1,58 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'ostruct'
+require 'json'
+
+# Simple helper to allow dotted access to a value, i.e. using {a.b.c} instead of {a[:b][:c]}
+def as_open_struct(value)
+  JSON.parse(value.to_json, object_class: OpenStruct)
+end
+
+machines = as_open_struct({
+  'dc01' => {
+    name: 'DC01',
+    hostname: 'DC01',
+    ip: '10.10.10.5',
+    netmask: '255.255.0.0',
+    box: 'StefanScherer/windows_2016',
+    box_version: '2019.02.14',
+    admin_password: 'dc01vagrant',
+    type: 'domain',
+    domain: 'demo.local'
+  },
+
+  'ws01' => {
+    name: 'WS01',
+    hostname: 'WS01',
+    ip: '10.10.10.6',
+    netmask: '255.255.0.0',
+    box: 'StefanScherer/windows_2016',
+    box_version: '2019.02.14',
+    admin_password: 'ws01vagrant',
+    type: 'workstation',
+    domain: 'demo.local',
+    domain_ip: '10.10.10.5',
+    domain_admin_password: 'dc01vagrant'
+  },
+
+  'dc02' => {
+    name: 'DC02',
+    hostname: 'DC02',
+    ip: '10.10.11.5',
+    netmask: '255.255.0.0',
+    box: 'StefanScherer/windows_2016',
+    box_version: '2019.02.14',
+    admin_password: 'dc02vagrant',
+    type: 'child_domain',
+    domain: 'dev.demo.local',
+    domain_ip: '10.10.11.6',
+    parent_domain: 'demo.local',
+    parent_domain_ip: '10.10.10.5',
+    parent_domain_admin_password: 'dc01vagrant',
+  }
+})
+
 Vagrant.configure("2") do |config|
   config.vm.synced_folder "./scripts", "/vagrant_scripts"
 
@@ -11,39 +63,39 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define("DC01", autostart: false) do |vm_config|
-    vm_config.vm.box = "StefanScherer/windows_2016"
-    vm_config.vm.box_version = "2019.02.14"
-    vm_config.vm.hostname = "DC01"
+    vm_config.vm.box = machines.dc01.box
+    vm_config.vm.box_version = machines.dc01.box_version
+    vm_config.vm.hostname = machines.dc01.hostname
 
     # Communication configuration
     vm_config.winrm.retry_limit = 60
     vm_config.winrm.retry_delay = 10
 
     # Use WinRM transport and force plaintext/basic auth - which stops digest initialization errors appearing
-    # The documentation has the caveat: Credentials will be transferred in plain text - which is fine for a test lab
+    # The docu/mentation has the caveat: Credentials will be transferred in plain text - which is fine for a test lab
     vm_config.winrm.transport = "plaintext"
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: '10.10.10.5', netmask: '255.255.0.0'
+    vm_config.vm.network "private_network", ip: machines.dc01.ip, netmask: machines.dc01.netmask
 
     vm_config.vm.provision(
       "shell",
       path: "scripts/windows/dc01-01-install-forest.ps1",
-      args: "-hostname DC01 -domain demo.local -domainIp 10.10.10.5 -administratorPassword vagrant"
+      args: "-hostname #{machines.dc01.hostname} -domain #{machines.dc01.domain} -domainIp #{machines.dc01.ip} -administratorPassword #{machines.dc01.admin_password}"
     )
     vm_config.vm.provision "shell", reboot: true
 
     vm_config.vm.provision(
       "shell",
       path: "scripts/windows/dc01-02-configure-dns.ps1",
-      args: "-hostname DC01 -domain demo.local -domainIp 10.10.10.5 -administratorPassword vagrant"
+      args: "-hostname #{machines.dc01.hostname} -domain #{machines.dc01.domain} -domainIp #{machines.dc01.ip} -administratorPassword #{machines.dc01.admin_password}"
     )
 
     vm_config.vm.provision(
       "shell",
       path: "scripts/windows/dc01-03-create-ad-objects.ps1",
-      args: "-hostname DC01 -domain demo.local -domainIp 10.10.10.5 -administratorPassword vagrant"
+      args: "-hostname #{machines.dc01.hostname} -domain #{machines.dc01.domain} -domainIp #{machines.dc01.ip} -administratorPassword #{machines.dc01.admin_password}"
     )
 
     if ENV['INSTALL_SOFTWARE']
@@ -53,9 +105,9 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define("WS01", autostart: false) do |vm_config|
-    vm_config.vm.box = "StefanScherer/windows_2016"
-    vm_config.vm.box_version = "2019.02.14"
-    vm_config.vm.hostname = "WS01"
+    vm_config.vm.box = machines.ws01.box
+    vm_config.vm.box_version = machines.ws01.box_version
+    vm_config.vm.hostname = machines.ws01.hostname
 
     # Communication configuration
     vm_config.winrm.retry_limit = 60
@@ -67,12 +119,12 @@ Vagrant.configure("2") do |config|
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: '10.10.10.6', netmask: '255.255.0.0'
+    vm_config.vm.network "private_network", ip: machines.ws01.ip, netmask: machines.ws01.netmask
 
     vm_config.vm.provision(
       "shell",
       path: "scripts/windows/ws01-01-install-workstation.ps1",
-      args: "-domain demo.local -domainIp 10.10.10.5 -administratorPassword vagrant"
+      args: "-domain #{machines.ws01.domain} -domainIp #{machines.ws01.domain_ip} -domainAdministratorPassword #{machines.ws01.domain_admin_password} -administratorPassword #{machines.ws01.admin_password}"
     )
     vm_config.vm.provision "shell", reboot: true
     if ENV['INSTALL_SOFTWARE']
@@ -82,9 +134,9 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define("DC02", autostart: false) do |vm_config|
-    vm_config.vm.box = "StefanScherer/windows_2016"
-    vm_config.vm.box_version = "2019.02.14"
-    vm_config.vm.hostname = "DC02"
+    vm_config.vm.box = machines.dc02.box
+    vm_config.vm.box_version = machines.dc02.box_version
+    vm_config.vm.hostname = machines.dc02.hostname
 
     # Communication configuration
     vm_config.winrm.retry_limit = 60
@@ -96,12 +148,12 @@ Vagrant.configure("2") do |config|
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: '10.10.11.5', netmask: '255.255.0.0'
+    vm_config.vm.network "private_network", ip: machines.dc02.ip, netmask: machines.dc02.netmask
 
     vm_config.vm.provision(
       "shell",
       path: "scripts/windows/dc02-01-install-forest.ps1",
-      args: "-parentDomain demo.local -parentDomainIp 10.10.10.5 -domain dev.demo.local -domainIp 10.10.11.6 -administratorPassword vagrant"
+      args: "-parentDomain #{machines.dc02.parent_domain} -parentDomainIp #{machines.dc02.parent_domain_ip} -domain #{machines.dc02.domain} -domainIp #{machines.dc02.domain_ip} -parentDomainAdministratorPassword #{machines.dc02.parent_domain_admin_password} -administratorPassword #{machines.dc02.admin_password}"
     )
     vm_config.vm.provision "shell", reboot: true
     if ENV['INSTALL_SOFTWARE']

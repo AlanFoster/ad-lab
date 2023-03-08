@@ -7,6 +7,9 @@ param (
     [parameter(Mandatory=$true)]
     [string]$parentDomain,
 
+    [parameter(Mandatory=$true)]
+    [string]$parentDomainAdministratorPassword,
+
     # [parameter(Mandatory=$true)]
     # [string]$hostname,
 
@@ -89,7 +92,9 @@ if (!$isDomainController) {
     $netbios = $domain.split('.')[0].ToUpperInvariant()
     Write-Host -fore green "[*] Installing ADDS for domain $domain and netbios $netbios"
     Import-Module ADDSDeployment
-    $credential = New-Object System.Management.Automation.PSCredential("$parentDomain\Administrator", $safeModeAdministratorPassword)
+
+    $safeParentDomainAdministratorPassword = ConvertTo-SecureString $parentDomainAdministratorPassword -AsPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential("$parentDomain\Administrator", $safeParentDomainAdministratorPassword)
 
     Install-ADDSDomain `
         -NoGlobalCatalog:$false `

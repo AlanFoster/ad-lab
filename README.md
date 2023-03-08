@@ -78,9 +78,9 @@ Running tests:
 
 ```
 # DC01
-bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc01_spec.rb
+bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password dc01vagrant ./spec/dc01_spec.rb
 # DC02
-bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc02_spec.rb
+bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password dc02vagrant ./spec/dc02_spec.rb
 # Kali
 bundle exec inspec exec -t ssh://vagrant@10.10.10.10 --password vagrant ./spec/kali_spec.rb
 ```
@@ -89,7 +89,7 @@ When developing inspec tests you can enter into an interactive repl / shell:
 
 ```
 # Windows DC01 example
-bundle inspec shell -t winrm://Administrator@10.10.10.5 --password vagrant
+bundle inspec shell -t winrm://Administrator@10.10.10.5 --password dc01vagrant
 
 # Kali example
 bundle inspec shell -t ssh://vagrant@10.10.10.10 --password vagrant
@@ -100,7 +100,7 @@ In the interactive inspec shell view all available resources with `help resource
 Example test run:
 
 ```
-$ bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password vagrant ./spec/dc01_spec.rb
+$ bundle exec inspec exec -t winrm://Administrator@10.10.10.5 --password dc01vagrant ./spec/dc01_spec.rb
 
 Profile:   tests from ./spec/dc01_spec.rb (tests from ..spec.dc01_spec.rb)
 Version:   (not specified)

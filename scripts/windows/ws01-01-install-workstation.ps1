@@ -8,6 +8,9 @@ param (
     [string]$domainIp,
 
     [parameter(Mandatory=$true)]
+    [string]$domainAdministratorPassword,
+
+    [parameter(Mandatory=$true)]
     [string]$administratorPassword
 )
 
@@ -63,9 +66,8 @@ Set-LocalUser `
     -PasswordNeverExpires:$true `
     -UserMayChangePassword:$true
 
-
 #
-# Install the Active Directory Domain Services (AD DS) environment
+# Add Computer to the AD environment
 #
 
 # Win32_operatingSystem ProductType
@@ -77,7 +79,10 @@ $isWorkstation = (Get-WmiObject -Class Win32_operatingSystem).ProductType -Eq 1
 Write-Host -fore green "[*] isWorkstation=$isWorkstation"
 if (!$isWorkstation) {
     Write-Host -fore green "[*] Adding computer $(hostname) to domain $domain"
-    $credential = New-Object System.Management.Automation.PSCredential("$domain\Administrator", $administratorPasswordSecure)
+
+    Write-Host "Using password: $($domainAdministratorPassword)"
+    $safeDomainAdministratorPassword = ConvertTo-SecureString $domainAdministratorPassword -AsPlainText -Force
+    $credential = New-Object System.Management.Automation.PSCredential("$domain\Administrator", $safeDomainAdministratorPassword)
 
     Add-Computer `
         -Credential $credential `
