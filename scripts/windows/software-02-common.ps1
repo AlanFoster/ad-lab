@@ -3,17 +3,33 @@ Set-StrictMode -Version 1.0
 # Exit if a cmdlet fails
 $ErrorActionPreference = "Stop"
 
+$scriptsRoot = "c:\vagrant\scripts\windows";
+if (!(Test-Path -Path $scriptsRoot)) {
+    $scriptsRoot = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+}
+
+. $scriptsRoot\helpers\invoke-nativecommandwitherrorcheck
+. $scriptsRoot\helpers\choco.ps1
+. $scriptsRoot\helpers\update-sessionenvironment.ps1
+. $scriptsRoot\helpers\vscode.ps1
+
 ##################################################################################
 # Choco
 ##################################################################################
 
 Write-Host -fore green '[*] Installing Choco software'
 
-Set-ExecutionPolicy Bypass -Scope Process -Force;
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+Install-Choco-With-Retries -package nmap
+Install-Choco-With-Retries -package wireshark
+Update-SessionEnvironment
 
-choco install -y --limit-output nmap wireshark googlechrome
+Install-Choco-With-Retries -package googlechrome
+
+# vscode
+Install-Vscode
+Update-SessionEnvironment
+Install-VscodeExtension -extension vscodevim.vim
+Install-VscodeExtension -extension eamodio.gitlens
 
 ##################################################################################
 # Misc

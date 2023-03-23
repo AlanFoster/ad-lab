@@ -19,6 +19,13 @@ Set-StrictMode -Version 1.0
 # Exit if a cmdlet fails
 $ErrorActionPreference = "Stop"
 
+$scriptsRoot = "c:\vagrant\scripts\windows";
+if (!(Test-Path -Path $scriptsRoot)) {
+    $scriptsRoot = (Split-Path -parent $MyInvocation.MyCommand.Definition)
+}
+
+. $scriptsRoot\helpers\antivirus.ps1
+
 ##################################################################################
 # Password policy configuration
 ##################################################################################
@@ -98,7 +105,4 @@ Write-Host -fore green '[*] Finished forest installation'
 # Disable Antivirus
 ##################################################################################
 
-if (Get-Module -ListAvailable -Name Defender) {
-    Set-MpPreference -DisableRealtimeMonitoring $true
-    New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" -Name DisableAntiSpyware -Value 1 -PropertyType DWORD -Force
-}
+Disable-Antivirus

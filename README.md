@@ -1,20 +1,36 @@
 ## AD-Lab
 
+Creates a local Active Directory lab in Virtual box. A separate Kali box, and Windows dev machine can also be provisioned.
+
+### Setup
+
+This lab requires Vagrant and Virtualbox to be installed on the host machine. At this time only Virtualbox is supported.
+
 Bringing a single domain controller up:
 
 ```
-vagrant up --provider=virtualbox DC01
+vagrant up --debug-timestamp --provider=virtualbox DC01
 ```
 
-Bringing all machines up:
+Bringing all Active Directory machines up:
 
 ```
-vagrant up --provider=virtualbox DC01 WS01 DC02 Kali
+vagrant up --debug-timestamp --provider=virtualbox DC01 WS01 DC02
 ```
 
-At this time only Virtualbox is supported
+Bringing all development machines up:
 
-To install additional software such as Chrome/nmap/Wireshark etc:
+```
+vagrant up --debug-timestamp --provider=virtualbox Kali WinDev
+```
+
+If you make changes to a provisioning script, you can run provisioning against the target manually:
+
+```
+vagrant provision --debug-timestamp --provider=virtualbox WinDev
+```
+
+To install additional software such as Chrome/nmap/Wireshark etc on a specific machine such as `DC01`:
 
 ```
 # Powershell
@@ -38,6 +54,7 @@ flowchart RL
     DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.11.6]
 
     Kali[Kali\n10.10.10.10]
+    Kali[WinDev\n10.10.10.11]
 
     subgraph demo.local [Domain: demo.local]
         direction BT

@@ -50,12 +50,40 @@ machines = as_open_struct({
     parent_domain: 'demo.local',
     parent_domain_ip: '10.10.10.5',
     parent_domain_admin_password: 'dc01vagrant',
+  },
+  'kali' => {
+    name: 'Kali',
+    hostname: 'Kali',
+    ip: '10.10.10.10',
+    netmask: '255.255.0.0',
+    box: 'kalilinux/rolling',
+    box_version: '2022.4.0',
+    admin_password: 'vagrant',
+  },
+  'windev' => {
+    name: 'WinDev',
+    hostname: 'WinDev',
+    ip: '10.10.10.11',
+    netmask: '255.255.0.0',
+    # box: 'StefanScherer/windows_2016',
+    # box_version: '2019.02.14',
+    # box: 'StefanScherer/windows_10',
+    # box_version: '2021.12.09',
+    box: 'gusztavvargadr/windows-10',
+    box_version: '2202.0.2303',
+    admin_password: 'vagrant',
   }
 })
 
-Vagrant.configure("2") do |config|
-  config.vm.synced_folder "./scripts", "/vagrant_scripts"
+# Register Choco software provisioning scripts for the given vm_config
+def with_common_software(vm_config)
+  vm_config.vm.provision("shell", path: "scripts/windows/software-01-install-choco.ps1")
+  vm_config.vm.provision("shell", reboot: true)
+  vm_config.vm.provision("shell", path: "scripts/windows/software-02-common.ps1")
+  vm_config.vm.provision("shell", reboot: true)
+end
 
+Vagrant.configure("2") do |config|
   # Disable vagrant-vbguest for faster setup times
   if Vagrant.has_plugin?("vagrant-vbguest")
     config.vbguest.auto_update = false
@@ -99,8 +127,7 @@ Vagrant.configure("2") do |config|
     )
 
     if ENV['INSTALL_SOFTWARE']
-      vm_config.vm.provision("shell", path: "scripts/windows/install-software.ps1")
-      vm_config.vm.provision "shell", reboot: true
+      with_common_software(vm_config)
     end
   end
 
@@ -128,8 +155,7 @@ Vagrant.configure("2") do |config|
     )
     vm_config.vm.provision "shell", reboot: true
     if ENV['INSTALL_SOFTWARE']
-      vm_config.vm.provision("shell", path: "scripts/windows/install-software.ps1")
-      vm_config.vm.provision "shell", reboot: true
+      with_common_software(vm_config)
     end
   end
 
@@ -157,21 +183,32 @@ Vagrant.configure("2") do |config|
     )
     vm_config.vm.provision "shell", reboot: true
     if ENV['INSTALL_SOFTWARE']
-      vm_config.vm.provision("shell", path: "scripts/windows/install-software.ps1")
-      vm_config.vm.provision "shell", reboot: true
+      with_common_software(vm_config)
     end
   end
 
   config.vm.define("Kali", autostart: false) do |vm_config|
-    vm_config.vm.box = "kalilinux/rolling"
-    vm_config.vm.box_version = "2022.4.0"
-    vm_config.vm.hostname = "Kali"
+    vm_config.vm.box = machines.kali.box
+    vm_config.vm.box_version = machines.kali.box_version
+    vm_config.vm.hostname = machines.kali.hostname
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: '10.10.10.10', netmask: '255.255.0.0'
+    vm_config.vm.network "private_network", ip: machines.kali.ip, netmask: machines.kali.netmask
 
     vm_config.vm.provision("shell", path: "scripts/kali/kali-01-update-software.sh")
     vm_config.vm.provision("shell", path: "scripts/kali/kali-02-user-setup.sh", privileged: false)
+  end
+
+  config.vm.define("WinDev", autostart: false) do |vm_config|
+    vm_config.vm.box = machines.windev.box
+    vm_config.vm.box_version = machines.windev.box_version
+    vm_config.vm.hostname = machines.windev.hostname
+
+    # IP Accessible from the host machine
+    vm_config.vm.network "private_network", ip: machines.windev.ip, netmask: machines.windev.netmask
+
+    # with_common_software(vm_config)
+    vm_config.vm.provision("shell", path: "scripts/windows/windev-01-install.ps1")
   end
 
   config.vm.provider "virtualbox" do |virtualbox|
@@ -192,6 +229,8 @@ Vagrant.configure("2") do |config|
       "--memory", "4096",
       "--cpus", "2",
       "--ioapic", "on",
+      '--clipboard-mode', 'bidirectional',
+      '--draganddrop', 'bidirectional'
     ]
   end
 end
