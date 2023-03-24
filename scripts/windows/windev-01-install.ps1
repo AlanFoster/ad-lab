@@ -27,6 +27,16 @@ Install-Git
 Update-SessionEnvironment
 
 ##################################################################################
+# Useful tools
+##################################################################################
+
+# Process monitoring for finding DLL path injections etc
+Install-Choco-With-Retries -package procmon
+
+# Fast alternative to using the default file explorer
+Install-Choco-With-Retries -package everything
+
+##################################################################################
 # Metasploit - Cloning framework plus installing all of the payload runtimes
 ##################################################################################
 
