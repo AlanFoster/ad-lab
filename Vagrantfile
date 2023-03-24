@@ -17,6 +17,8 @@ machines = as_open_struct({
     netmask: '255.255.0.0',
     box: 'StefanScherer/windows_2016',
     box_version: '2019.02.14',
+    # box: 'gusztavvargadr/windows-server',
+    # box_version: '2102.0.2303',
     admin_password: 'dc01vagrant',
     type: 'domain',
     domain: 'demo.local'
@@ -57,7 +59,7 @@ machines = as_open_struct({
     ip: '10.10.10.10',
     netmask: '255.255.0.0',
     box: 'kalilinux/rolling',
-    box_version: '2022.4.0',
+    box_version: '2023.1.0',
     admin_password: 'vagrant',
   },
   'windev' => {
