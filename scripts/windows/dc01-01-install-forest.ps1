@@ -108,6 +108,14 @@ Write-Host -fore green '[*] Finished forest installation'
 ##################################################################################
 
 if (Get-Module -ListAvailable -Name Defender) {
-    Set-MpPreference -DisableRealtimeMonitoring $true
-    New-ItemProperty -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows Defender" -Name DisableAntiSpyware -Value 1 -PropertyType DWORD -Force
+    Set-MpPreference `
+        -DisableIntrusionPreventionSystem:$true `
+        -DisableIOAVProtection:$true `
+        -DisableRealtimeMonitoring:$true `
+        -DisableScriptScanning:$true `
+        -EnableControlledFolderAccess Disabled `
+        -EnableNetworkProtection AuditMode `
+        -Force `
+        -MAPSReporting Disabled `
+        -SubmitSamplesConsent NeverSend
 }
