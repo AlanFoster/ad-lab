@@ -54,7 +54,7 @@ flowchart RL
     DC02[DC02\nparent domain:\n demo.local\ndomain: dev.demo.local\n10.10.11.6]
 
     Kali[Kali\n10.10.10.10]
-    Kali[WinDev\n10.10.10.11]
+    WinDev[WinDev\n10.10.10.11]
 
     subgraph demo.local [Domain: demo.local]
         direction BT
