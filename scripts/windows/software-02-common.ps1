@@ -19,9 +19,9 @@ if (!(Test-Path -Path $scriptsRoot)) {
 
 Write-Host -fore green '[*] Installing Choco software'
 
-Install-Choco-With-Retries -package nmap
-Install-Choco-With-Retries -package wireshark
-Update-SessionEnvironment
+# Install-Choco-With-Retries -package nmap
+# Install-Choco-With-Retries -package wireshark
+# Update-SessionEnvironment
 
 Install-Choco-With-Retries -package googlechrome
 
@@ -30,6 +30,7 @@ Install-Vscode
 Update-SessionEnvironment
 Install-VscodeExtension -extension vscodevim.vim
 Install-VscodeExtension -extension eamodio.gitlens
+Install-VscodeExtension -extension ms-azuretools.vscode-docker
 
 ##################################################################################
 # Misc

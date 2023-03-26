@@ -209,7 +209,7 @@ Vagrant.configure("2") do |config|
     # IP Accessible from the host machine
     vm_config.vm.network "private_network", ip: machines.windev.ip, netmask: machines.windev.netmask
 
-    # with_common_software(vm_config)
+    with_common_software(vm_config)
     vm_config.vm.provision("shell", path: "scripts/windows/windev-01-install.ps1")
   end
 

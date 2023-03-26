@@ -13,7 +13,7 @@ if (!(Test-Path -Path $scriptsRoot)) {
 
 # Install Git
 function Install-Git() {
-    Install-Choco-With-Retries -package git -arguments "--params `"'/GitAndUnixToolsOnPath /NoAutoCrlf'`""
+    Install-Choco-With-Retries -package git -params "'/GitAndUnixToolsOnPath /NoAutoCrlf'"
 }
 
 # Install the Git repo, or perform a Git fetch if it already exists

@@ -22,10 +22,14 @@ function Get-LocalChocoPackageDetails (
 }
 
 # The default choco can fail to install. This function wraps the installation process with retry behavior
-function Install-Choco-With-Retries(
-    [string]$package,
-    [string[]]$arguments = @()
-) {
+function Install-Choco-With-Retries {
+    [CmdletBinding()]
+    Param
+    (
+        [parameter(mandatory=$true, position=0)][string]$package,
+        [parameter(mandatory=$false, position=1, ValueFromRemainingArguments=$true)]$arguments
+    )
+
     # Checking for existing install details is faster and quieter than running choco install again
     $existingChocoInstallDetails = Get-LocalChocoPackageDetails $package
     if ($existingChocoInstallDetails) {

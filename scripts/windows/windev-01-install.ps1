@@ -13,6 +13,7 @@ if (!(Test-Path -Path $scriptsRoot)) {
 . $scriptsRoot\helpers\git.ps1
 . $scriptsRoot\helpers\antivirus.ps1
 
+
 ##################################################################################
 # Disable Antivirus
 ##################################################################################
@@ -36,6 +37,9 @@ Install-Choco-With-Retries -package procmon
 # Fast alternative to using the default file explorer
 Install-Choco-With-Retries -package everything
 
+# Multiple quality of life improvements
+Install-Choco-With-Retries -package powertoys
+
 ##################################################################################
 # Metasploit - Cloning framework plus installing all of the payload runtimes
 ##################################################################################
@@ -45,7 +49,7 @@ Install-Choco-With-Retries -package php
 Install-Choco-With-Retries -package python
 
 # Log in with: psql "postgres://postgres:vagrant@localhost:5432"
-Install-Choco-With-Retries -package postgresql12 -arguments "--params '/Password:vagrant /Port:5432' --installargs '--enable-components commandlinetools'"
+Install-Choco-With-Retries -package postgresql12 --params '/Password:vagrant /Port:5432' --installargs '--enable-components commandlinetools'
 
 Update-SessionEnvironment
 
@@ -61,9 +65,9 @@ Invoke-NativeCommandWithErrorCheck 7z x $winPcapZip -aoa -o"C:\"
 # Copy-Item -Force C:\WpdPack\Lib\x64\wpcap.lib C:\WpdPack\Lib\
 
 # ruby 3.0.x is only supported with winpcap: https://github.com/pcaprub/pcaprub/issues/62
-Install-Choco-With-Retries -package ruby -arguments '--version=3.0.5.1'
+Install-Choco-With-Retries -package ruby --version=3.0.5.1
 # install msys2 without system update
-Install-Choco-With-Retries -package msys2 -arguments '--params "/NoUpdate"'
+Install-Choco-With-Retries -package msys2 --params "/NoUpdate"
 Update-SessionEnvironment
 
 # use ruby's ridk to update the system and install development toolchain
@@ -72,3 +76,10 @@ Update-SessionEnvironment
 
 Set-Location C:/metasploit-framework
 Invoke-NativeCommandWithErrorCheck bundle
+
+##################################################################################
+# Visual studio
+##################################################################################
+
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/rapid7/metasploit-payloads/master/c/meterpreter/vs-configs/vs2019.vsconfig -OutFile c:/windows/temp/vs2019.vsconfig
+Install-Choco-With-Retries -package visualstudio2019community --package-parameters "--config c:/windows/temp/vs2019.vsconfig"
