@@ -213,6 +213,13 @@ Vagrant.configure("2") do |config|
     vm_config.vm.provision("shell", path: "scripts/windows/windev-01-install.ps1")
   end
 
+  config.vm.provider "vmware_desktop" do |v|
+    v.gui = true
+    v.linked_clone = false
+     v.vmx["memsize"] = "4096"
+    v.vmx["numvcpus"] = "2"
+  end
+
   config.vm.provider "virtualbox" do |virtualbox|
     # Display the VirtualBox GUI when booting the machine
     virtualbox.gui = true

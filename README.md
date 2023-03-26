@@ -2,6 +2,18 @@
 
 Creates a local Active Directory lab in Virtual box. A separate Kali box, and Windows dev machine can also be provisioned.
 
+##
+
+Running with vmware destop:
+
+```
+# 1) Install vmware driver:
+https://developer.hashicorp.com/vagrant/downloads/vmware
+
+# 2) Install the vagrant plugin:
+vagrant plugin install vagrant-vmware-desktop
+```
+
 ### Setup
 
 This lab requires Vagrant and Virtualbox to be installed on the host machine. At this time only Virtualbox is supported.
