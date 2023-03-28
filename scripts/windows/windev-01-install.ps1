@@ -37,8 +37,15 @@ Install-Choco-With-Retries -package procmon
 # Fast alternative to using the default file explorer
 Install-Choco-With-Retries -package everything
 
-# Multiple quality of life improvements
-Install-Choco-With-Retries -package powertoys
+# Powertools - for multiple quality of life improvements. Not supported on all versions:
+#
+$buildNumber = [Environment]::OSVersion.Version.Build
+if ($buildNumber -Gt 17134) {
+    Install-Choco-With-Retries -package powertoys
+} else {
+    Write-Host "[!] Skipping powertools install - build number $buildNumber not supported"
+}
+
 
 ##################################################################################
 # Metasploit - Cloning framework plus installing all of the payload runtimes

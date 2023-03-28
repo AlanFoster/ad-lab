@@ -67,12 +67,12 @@ machines = as_open_struct({
     hostname: 'WinDev',
     ip: '10.10.10.11',
     netmask: '255.255.0.0',
-    # box: 'StefanScherer/windows_2016',
-    # box_version: '2019.02.14',
+    box: 'StefanScherer/windows_2016',
+    box_version: '2019.02.14',
     # box: 'StefanScherer/windows_10',
     # box_version: '2021.12.09',
-    box: 'gusztavvargadr/windows-10',
-    box_version: '2202.0.2303',
+    # box: 'gusztavvargadr/windows-10',
+    # box_version: '2202.0.2303',
     admin_password: 'vagrant',
   }
 })
