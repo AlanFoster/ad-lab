@@ -13,7 +13,6 @@ if (!(Test-Path -Path $scriptsRoot)) {
 . $scriptsRoot\helpers\git.ps1
 . $scriptsRoot\helpers\antivirus.ps1
 
-
 ##################################################################################
 # Disable Antivirus
 ##################################################################################
@@ -90,3 +89,12 @@ Invoke-NativeCommandWithErrorCheck bundle
 
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/rapid7/metasploit-payloads/master/c/meterpreter/vs-configs/vs2019.vsconfig -OutFile c:/windows/temp/vs2019.vsconfig
 Install-Choco-With-Retries -package visualstudio2019community --package-parameters "--config c:/windows/temp/vs2019.vsconfig"
+
+##################################################################################
+# Metasploit Payloads
+##################################################################################
+
+Install-GitRepo https://github.com/rapid7/metasploit-payloads.git c:/metasploit-payloads
+Set-Location c:/metasploit-payloads
+git submodule init
+git submodule update
