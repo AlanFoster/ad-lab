@@ -10,6 +10,10 @@ export user_directory=~
 # Metasploit setup
 #################################################################################
 
+# RVM
+gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+curl -sSL https://get.rvm.io | bash -s stable
+
 git_fetch_or_clone https://github.com/rapid7/metasploit-framework $user_directory/metasploit-framework
 idempotent_append '[remote "upstream"]' "$user_directory/metasploit-framework/.git/config"
 idempotent_append '	url = https://github.com/rapid7/metasploit-framework.git' "$user_directory/metasploit-framework/.git/config"
@@ -17,6 +21,7 @@ idempotent_append '	fetch = +refs/heads/*:refs/remotes/upstream/*' "$user_direct
 idempotent_append '	fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*' "$user_directory/metasploit-framework/.git/config"
 (
     cd $user_directory/metasploit-framework
+    $SHELL --login -c 'rvm install $(cat .ruby-version)'
     bundle
 )
 
@@ -28,7 +33,7 @@ git_fetch_or_clone https://github.com/AlanFoster/toolbox.git $user_directory/too
 (
     cd $user_directory/toolbox
     git submodule update --init --recursive
-    python3 -m pip install -r requirements.txt
+    ./install.sh
     python3 $user_directory/toolbox/toolbox.py --help
 )
 
