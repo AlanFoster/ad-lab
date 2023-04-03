@@ -1,0 +1,27 @@
+---
+
+##################################################################################
+# Dirsearch - Python directory explorer, with recursive searching and wordlist
+##################################################################################
+
+- name: Dirsearch
+  hosts: all
+  become: false
+  remote_user: vagrant
+
+  vars:
+    install_directory: '/home/vagrant/dirsearch'
+
+  tasks:
+    - name: Dirsearch - Clone
+      git:
+        repo: 'https://github.com/maurosoria/dirsearch.git'
+        dest: '{{ install_directory }}'
+        # Ensure submodules are installed
+        recursive: true
+      register: clone
+
+    - name: Dirsearch - Install
+      when: clone.changed
+      pip:
+        requirements: '{{ install_directory }}/requirements.txt'

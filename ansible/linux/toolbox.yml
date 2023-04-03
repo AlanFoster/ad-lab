@@ -1,0 +1,33 @@
+---
+
+#################################################################################
+# Toolbox - File server, payload/shell generation, and useful tools like linpeas
+#################################################################################
+
+- name: Install toolbox
+  hosts: all
+  become: false
+  remote_user: vagrant
+
+  vars:
+    install_directory: '/home/vagrant/toolbox'
+
+  tasks:
+    - name: Toolbox - Clone
+      git:
+        repo: 'https://github.com/AlanFoster/toolbox.git'
+        dest: '{{ install_directory }}'
+        # Ensure submodules are installed
+        recursive: true
+
+    - name: Toolbox - Install
+      when: clone.changed
+      shell: |
+        ./install.sh
+        python3 {{ install_directory }}/toolbox.py --help
+      args:
+        chdir: '{{ install_directory }}'
+
+    - name: Toolbox - Verify
+      when: clone.changed
+      shell: 'python3 {{ install_directory }}/toolbox.py --help'

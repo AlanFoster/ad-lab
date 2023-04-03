@@ -1,0 +1,18 @@
+---
+
+##################################################################################
+# Terminal configuration
+##################################################################################
+
+- name: QTerminal
+  hosts: all
+  become: false
+  remote_user: vagrant
+
+  tasks:
+    - name: QTerminal - Install config
+      copy:
+        src: '{{ playbook_dir }}/qterminal.ini'
+        dest: '~/.config/qterminal.org/qterminal.ini'
+        # Replace the remote file if contents are different
+        force: true

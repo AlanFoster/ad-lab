@@ -2,7 +2,9 @@
 
 Creates a local Active Directory lab in Virtual box. A separate Kali box, and Windows dev machine can also be provisioned.
 
-##
+##  Pre-requisites
+
+This lab requires Vagrant, and either VirtualBox or Vmware to be installed on the host
 
 Running with vmware destop:
 
@@ -14,32 +16,43 @@ https://developer.hashicorp.com/vagrant/downloads/vmware
 vagrant plugin install vagrant-vmware-desktop
 ```
 
-### Setup
+## Setup
 
-This lab requires Vagrant and Virtualbox to be installed on the host machine. At this time only Virtualbox is supported.
+There are two stages to the AD-LAB:
+1. Create VMs - Create the default virtual machine with no software installed
+2. Provision VMs - Install the software onto the virtual machines created in step 1
 
-Bringing a single domain controller up:
+### Create VMs
+
+The following providers are supported:
+
+1. `virtualbox`
+2. `vmware_desktop`
+
+Create a single domain controller:
 
 ```
 vagrant up --debug-timestamp --provider=virtualbox DC01
 ```
 
-Bringing all Active Directory machines up:
+Create Active Directory machines:
 
 ```
 vagrant up --debug-timestamp --provider=virtualbox DC01 WS01 DC02
 ```
 
-Bringing all development machines up:
+Create development machines:
 
 ```
 vagrant up --debug-timestamp --provider=virtualbox Kali WinDev
 ```
 
-If you make changes to a provisioning script, you can run provisioning against the target manually:
+### Provisioning
+
+Ansible is currently used for provisioning:
 
 ```
-vagrant provision --debug-timestamp --provider=virtualbox WinDev
+time ansible-playbook -i ansible/inventory --limit Kali ansible/kali.yml
 ```
 
 To install additional software such as Chrome/nmap/Wireshark etc on a specific machine such as `DC01`:
@@ -83,11 +96,13 @@ flowchart RL
    demo.local --> |TrustedBy| dev.demo.local
 ```
 
-### Architecture Decisions
+### Architectural Decisions
 
-All Powershell scripts are designed to be idempotent, i.e. they can be run again without causing issues.
+All provisionining logic is designed to be idempotent, i.e. can be run again without causing issues.
 
-For simplicitly the setup scripts do not use Ansible or Chef. Window's [Desired State Configuration](https://learn.microsoft.com/en-us/powershell/dsc/overview?view=dsc-2.0) was investigated, but it's not clear if this technology is actively maintained as the latest news is deprecating support for Linux.
+Previously standalone Bash/Powershell scripts were used in conjunction with Vagrant's default [shell provisioning](https://developer.hashicorp.com/vagrant/docs/v2.3.3/provisioning/shell). The project was then migrated to use Ansible, which provides basic building blocks such as idempotent wrappers around Git/Choco/etc, that wouldn't need to be re-implemented in bash/powershell.
+
+Chef was not used as it required additional complexity in comparison to Ansible. Window's [Desired State Configuration](https://learn.microsoft.com/en-us/powershell/dsc/overview?view=dsc-2.0) was investigated, but it's not clear if this technology is actively maintained as the latest news is deprecating support for Linux.
 
 ### Testing
 

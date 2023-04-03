@@ -1,0 +1,56 @@
+---
+
+##################################################################################
+# Packages - Install common Kali packages
+##################################################################################
+
+- name: Packages
+  hosts: all
+  become: true
+  remote_user: vagrant
+
+  tasks:
+    - name: 'Packages - Install'
+      apt:
+        pkg:
+          # Install the latest Kali metasploit-framework release
+          - metasploit-framework
+          # Install the dependencies for local metasploit-framework development builds
+          - autoconf
+          - build-essential
+          - libpcap-dev
+          - libpq-dev
+          - zlib1g-dev
+          - libsqlite3-dev
+          # CrackMapExec - SMB/WinRM/etc enumeration - https://github.com/Porchetta-Industries/CrackMapExec
+          - cme
+          # Active Directory configuration viewer - https://github.com/BloodHoundAD/BloodHound
+          - bloodhound
+          # Web application scanner
+          - nikto
+          # Visual studio code for file editing
+          - code-oss
+          # Copy/paste suport via the command line
+          - xsel
+        state: latest
+        update_cache: true
+
+    ##################################################################################
+    # Bloodhound Configuration
+    ##################################################################################
+
+    - name: 'Packages - Bloodhound set password'
+      shell: |
+        /usr/share/neo4j/bin/neo4j-admin set-initial-password bloodhound
+      # Skip marking the password being set as a change
+      changed_when: false
+
+    ##################################################################################
+    # Wordlists
+    ##################################################################################
+
+    - name: 'Packages - Extract rockyou.txt.gz'
+      shell: |
+        gzip --decompress --keep /usr/share/wordlists/rockyou.txt.gz
+      args:
+        creates: /usr/share/wordlists/rockyou.txt

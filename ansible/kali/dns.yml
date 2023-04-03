@@ -1,0 +1,30 @@
+---
+
+##################################################################################
+# DNS Configuration
+##################################################################################
+
+- name: DNS
+  hosts: all
+  become: true
+  remote_user: vagrant
+
+  tasks:
+    # Write directly to /etc/hosts, and don't use the domain controller for DNS in /etc/resolve.conf
+    - name: DNS - DC01
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^10\.10\.10\.5'
+        line: 10.10.10.5 dc01.demo.local demo.local
+
+    - name: DNS - WS01
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^10\.10\.10\.6'
+        line: 10.10.10.6 ws01.demo.local
+
+    - name: DNS - DC02
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^10\.10\.11\.5'
+        line: 10.10.11.5 dc02.dev.demo.local dev.demo.local

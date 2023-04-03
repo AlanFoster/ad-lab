@@ -1,0 +1,73 @@
+---
+
+##################################################################################
+# zsh configuration - Ensure unlimited history, custom aliases etc
+##################################################################################
+
+- name: zsh
+  hosts: all
+  become: false
+  remote_user: vagrant
+
+  vars:
+    zshrc: /home/vagrant/.zshrc
+    zshrc_custom: /home/vagrant/.zshrc_custom
+    zsh_history: /home/vagrant/.zsh_history
+    zsh_history_custom: /home/vagrant/.zsh_history_custom
+
+  tasks:
+
+    ##################################################################################
+    # zsh configuration - Unlimited history
+    ##################################################################################
+
+    - name: zsh - unlimited histsize
+      lineinfile:
+        path: '{{ zshrc }}'
+        regexp: '^HISTSIZE='
+        line: HISTSIZE=10000000
+
+    - name: zsh - unlimited savehist
+      lineinfile:
+        path: '{{ zshrc }}'
+        regexp: '^SAVEHIST='
+        line: SAVEHIST=10000000
+
+    # ##################################################################################
+    # # zsh configuration - custom commands/alias etc
+    # ##################################################################################
+
+    - name: zsh - Copy custom zshrc
+      copy:
+        src: '{{ playbook_dir }}/.zshrc_custom'
+        dest: '{{ zshrc_custom }}'
+        mode: '0644'
+        # Replace the remote file if contents are different
+        force: true
+
+    - name: zsh - Register custom zsh commands
+      lineinfile:
+        path: '{{ zshrc }}'
+        line: '. {{ zshrc_custom }}'
+
+    ##################################################################################
+    # zsh configuration - custom history
+    ##################################################################################
+
+    - name: zsh - Copy history
+      copy:
+        src: '{{ playbook_dir }}/.zsh_history_custom'
+        dest: '{{ zsh_history_custom }}'
+        mode: '0644'
+        # Replace the remote file if contents are different
+        force: true
+      register: zsh_custom_history
+
+    - name: zsh - Merge history
+      when: zsh_custom_history.changed
+      shell: |
+        touch '{{ zsh_history }}'
+        chmod 0644 '{{ zsh_history }}'
+        comm -23 <(sort '{{ zsh_history_custom }}') <(sort '{{ zsh_history }}') >> '{{ zsh_history }}'
+      args:
+        executable: /bin/zsh

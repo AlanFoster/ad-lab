@@ -4,7 +4,7 @@
 require 'ostruct'
 require 'json'
 
-# Simple helper to allow dotted access to a value, i.e. using {a.b.c} instead of {a[:b][:c]}
+# Simple helper to allow dotted access to a hash value, i.e. using {a.b.c} instead of {a[:b][:c]}
 def as_open_struct(value)
   JSON.parse(value.to_json, object_class: OpenStruct)
 end
@@ -196,9 +196,6 @@ Vagrant.configure("2") do |config|
 
     # IP Accessible from the host machine
     vm_config.vm.network "private_network", ip: machines.kali.ip, netmask: machines.kali.netmask
-
-    vm_config.vm.provision("shell", path: "scripts/kali/kali-01-update-software.sh")
-    vm_config.vm.provision("shell", path: "scripts/kali/kali-02-user-setup.sh", privileged: false)
   end
 
   config.vm.define("WinDev", autostart: false) do |vm_config|

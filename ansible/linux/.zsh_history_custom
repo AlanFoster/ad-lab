@@ -18,6 +18,7 @@ rpcclient 10.10.10.10
 
 # File serving
 sudo -E python3 ~/toolbox/toolbox.py serve . -p 80
+python3 -m http.server
 
 # fuse mount for vmware
 sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other -o uid=1000
