@@ -1,15 +1,16 @@
 ---
 
+# Packages
+- import_playbook: kali/packages.yml
+
 # Tools
 - import_playbook: linux/dirsearch.yml
 - import_playbook: linux/toolbox.yml
+- import_playbook: linux/metasploit-framework.yml
 
 # Terminal
 - import_playbook: linux/qterminal.yml
 - import_playbook: linux/zsh.yml
-
-# Packages
-- import_playbook: kali/packages.yml
 
 # DNS
 - import_playbook: kali/dns.yml

@@ -1,0 +1,174 @@
+---
+
+#################################################################################
+# Metasploit payloads
+#################################################################################
+
+- name: 'Metasploit payloads'
+  hosts: all
+  become: false
+  gather_facts: false
+
+  vars:
+    install_directory: 'c:/metasploit-payloads'
+    visual_studio_requirements: 'c:/Windows/Temp/vs2019.vsconfig'
+    psexec_path: 'c:/Windows/Temp/PsExec64.exe'
+
+  tasks:
+
+    #################################################################################
+    # Pre-requisite reboot
+    #################################################################################
+
+    # - name: Visual studio - check if reboot required, otherwise visual studio won't install
+    #   win_pending_reboot_info: {}
+    #   register: pending_reboot_info
+
+    # - name: Visual studio - reboot if reboot is pending
+    #   win_reboot: {}
+    #   when: pending_reboot_info.reboot_required
+
+    # - name: Visual studio - Ensure WinRM starts when the system has settled and is ready to work reliably
+    #   win_service:
+    #     name: WinRM
+    #     start_mode: delayed
+
+    #################################################################################
+    # visual studio dependencies
+    #################################################################################
+
+
+    # - name: Visual studio - Download dotnetfx
+    #   chocolatey.chocolatey.win_chocolatey:
+    #     name:
+    #       - dotnetfx
+    #   # XXX: dotnetfx requires an interactive session to install successfully; It's a subset of the visualstudio install
+    #   become_method: runas
+    #   become: true
+    #   become_user: '{{ ansible_user }}'
+
+    # Ensure sysinternals is installed, for psexec access
+    # - name: Visual studio - Download psexec
+    #   win_get_url:
+    #     url: 'https://live.sysinternals.com/PsExec64.exe'
+    #     dest: '{{ psexec_path }}'
+    #     checksum: 0098c79e1404b4399bf0e686d88dbf052269a302
+    #     checksum_algorithm: sha1
+
+    # # Explicitly install dotnetfx, as a raw visualstudio2019community install over winrm/ansible fails
+    # # https://stackoverflow.com/questions/41835740/install-net-framework-4-6-1-using-ansible
+    # - name: Visual studio - install dotnetfx via psexec
+    #   win_psexec:
+    #     command: "choco install -y --force dotnetfx"
+    #     executable: '{{ psexec_path }}'
+    #     elevated: true
+    #     nobanner: true
+    #     interactive: true
+    #   register: dotnetfx_result
+    #   # XXX: There are more exit codes from Chocolatey now that indicate success -0, 1605, 1614, 1641, and 3010.
+    #   # https://docs.chocolatey.org/en-us/choco/release-notes#breaking-changes-7
+    #   # 3010 indicates a restart is required
+    #   failed_when: "dotnetfx_result.rc not in [0, 3010]"
+
+    # - name: Visual studio - reboot if reboot choco is 3010 exit code
+    #   win_reboot: {}
+    #   when: dotnetfx_result.rc == 3010
+
+    # - name: Visual studio - Ensure WinRM starts when the system has settled and is ready to work reliably
+    #   win_service:
+    #     name: WinRM
+    #     start_mode: delayed
+    #   when: dotnetfx_result.rc == 3010
+
+    - name: Visual studio - Download requirements
+      ansible.windows.win_get_url:
+        url: 'https://raw.githubusercontent.com/rapid7/metasploit-payloads/master/c/meterpreter/vs-configs/vs2019.vsconfig'
+        dest: '{{ visual_studio_requirements }}'
+        checksum: a38ed9e7301f0ff8ec3bc1ec36f6da027680b732
+        checksum_algorithm: sha1
+
+    # Original command:
+    #   choco install visualstudio2019community --package-parameters "--config c:/windows/temp/vs2019.vsconfig"
+    - name: Install visual studio
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - visualstudio2019community
+        package_params: '--config {{ visual_studio_requirements }}'
+        state: present
+      become_method: runas
+      become: true
+      become_user: '{{ ansible_user }}'
+
+    # #################################################################################
+    # # Winpcap installation - from https://www.winpcap.org/devel.htm
+    # #################################################################################
+
+    # - name: winpcap - Check if dev dependencies present
+    #   win_stat:
+    #     path: '{{ winpcap_wpdpack_lib }}'
+    #   register: winpcap_dev_dependencies
+
+    # # Required for installing winpcap as part of bundle install in metasploit-framework
+    # - name: winpcap - Download dev dependencies
+    #   win_get_url:
+    #     url: 'https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip'
+    #     dest: '{{ winpcap_wpdpack_zip }}'
+    #     checksum: f5c80885bd48f07f41833d0f65bf85da1ef1727a
+    #     checksum_algorithm: sha1
+    #   when: not winpcap_dev_dependencies.stat.exists
+
+    # - name: winpcap - Download dev dependencies
+    #   win_get_url:
+    #     url: 'https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip'
+    #     dest: '{{ winpcap_wpdpack_zip }}'
+    #     checksum: f5c80885bd48f07f41833d0f65bf85da1ef1727a
+    #     checksum_algorithm: sha1
+    #   when: not winpcap_dev_dependencies.stat.exists
+
+    # - name: winpcap - unzip wpdpack
+    #   win_unzip:
+    #     src: '{{ winpcap_wpdpack_zip }}'
+    #     dest: '{{ winpcap_wpdpack_extract_folder }}'
+    #     creates: '{{ winpcap_wpdpack_lib }}'
+
+    # #################################################################################
+    # # Ruby and bundle
+    # #################################################################################
+
+    # - name: Install Ruby
+    #   win_chocolatey:
+    #     name:
+    #       - ruby
+    #     # ruby 3.0.x is only supported with winpcap: https://github.com/pcaprub/pcaprub/issues/62
+    #     version: '3.0.5.1'
+    #     state: present
+    #   register: ruby_install
+
+    # - name: Install msys2
+    #   win_chocolatey:
+    #     name:
+    #       - msys2
+    #     package_params: '/NoUpdate'
+    #     state: present
+    #   register: msys2_install
+
+    # - name: Ruby - use ruby's ridk to update the system and install development toolchain
+    #   win_shell: ridk install 2 3
+    #   when: ruby_install.changed or msys2_install.changed
+
+    # #################################################################################
+    # # Metasploit cloning and bundle
+    # #################################################################################
+
+    # - name: Metasploit - Clone
+    #   win_git:
+    #     repo: 'https://github.com/rapid7/metasploit-framework'
+    #     dest: '{{ install_directory }}'
+    #   register: metasploit_clone
+
+    # - name: Metasploit - bundle install
+    #   win_shell: |
+    #     bundle install
+    #   args:
+    #     chdir: '{{ install_directory }}'
+    #   # when: metasploit_clone.changed

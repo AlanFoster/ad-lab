@@ -14,6 +14,9 @@ https://developer.hashicorp.com/vagrant/downloads/vmware
 
 # 2) Install the vagrant plugin:
 vagrant plugin install vagrant-vmware-desktop
+
+# 3) Configure Ansible
+ansible-galaxy collection install chocolatey.chocolatey
 ```
 
 ## Setup
@@ -52,7 +55,9 @@ vagrant up --debug-timestamp --provider=virtualbox Kali WinDev
 Ansible is currently used for provisioning:
 
 ```
-time ansible-playbook -i ansible/inventory --limit Kali ansible/kali.yml
+cd ansible
+time ANSIBLE_CONFIG=$(pwd) ansible-playbook -i inventory --limit Kali kali.yml
+time ANSIBLE_CONFIG=$(pwd) ansible-playbook -i inventory --limit WinDev windev.yml -vvv
 ```
 
 To install additional software such as Chrome/nmap/Wireshark etc on a specific machine such as `DC01`:

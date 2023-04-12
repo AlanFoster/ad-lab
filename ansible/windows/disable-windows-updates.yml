@@ -1,0 +1,16 @@
+---
+
+#################################################################################
+# Disable windows updates
+#################################################################################
+
+- hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Disable windows updates
+      win_service:
+        name: wuauserv
+        start_mode: disabled
+        state: stopped

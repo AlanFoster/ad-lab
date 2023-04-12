@@ -1,0 +1,12 @@
+---
+
+# Boilerplate
+- import_playbook: windows/disable-windows-updates.yml
+
+# Packages - Git, Python, etc
+- import_playbook: windows/common-packages.yml
+- import_playbook: windows/dev-packages.yml
+
+# Tools
+- import_playbook: windows/metasploit-framework.yml
+- import_playbook: windows/metasploit-payloads.yml

@@ -206,14 +206,19 @@ Vagrant.configure("2") do |config|
     # IP Accessible from the host machine
     vm_config.vm.network "private_network", ip: machines.windev.ip, netmask: machines.windev.netmask
 
-    with_common_software(vm_config)
-    vm_config.vm.provision("shell", path: "scripts/windows/windev-01-install.ps1")
+    vm_config.vm.provision("shell", path: "scripts/windows/ConfigureRemotingForAnsible.ps1")
+    vm_config.vm.provision("shell", path: "scripts/windows/install-choco.ps1")
+    # XXX: vmware requires an additional configuration step:
+    # ==> WinDev: Configuring secondary network adapters through VMware
+    # ==> WinDev: on Windows is not yet supported. You will need to manually
+    # ==> WinDev: configure the network adapter.
+    # https://github.com/hashicorp/vagrant/issues/5000
   end
 
   config.vm.provider "vmware_desktop" do |v|
     v.gui = true
     v.linked_clone = false
-     v.vmx["memsize"] = "4096"
+    v.vmx["memsize"] = "4096"
     v.vmx["numvcpus"] = "2"
   end
 

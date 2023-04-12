@@ -1,0 +1,68 @@
+---
+
+#################################################################################
+# Dev Packages
+#################################################################################
+
+- hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    #################################################################################
+    # Git
+    #################################################################################
+
+    - name: Install git
+      win_chocolatey:
+        name: git
+        package_params:
+          - /GitAndUnixToolsOnPath
+          - /NoAutoCrlf
+        state: present
+
+    #################################################################################
+    # Language Packages - i.e. for payload testing
+    #################################################################################
+
+    - name: Install python
+      win_chocolatey:
+        name:
+          - python
+        state: present
+
+    - name: Install php
+      win_chocolatey:
+        name:
+          - php
+        state: present
+
+    #################################################################################
+    # Other Packages
+    #################################################################################
+
+    - name: Install procmon - Process monitoring for finding DLL path injections etc
+      win_chocolatey:
+        name:
+          - procmon
+        state: present
+
+    - name: Install everything.exe - Fast alternative to using the default file explorer
+      win_chocolatey:
+        name:
+          - everything
+        state: present
+
+    # Extract build number for powertools
+    - name: Extract windows build number
+      win_shell: '[Environment]::OSVersion.Version.Build'
+      register: win_build_number
+      changed_when: false
+
+    # Install powertools only if available on the target host
+    - name: Install Powertools - for multiple quality of life improvements. Install skipped if win_build_number less than 17134
+      win_chocolatey:
+        name:
+          - everything
+        state: present
+      when: win_build_number|int >= 17134

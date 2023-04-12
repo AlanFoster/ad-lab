@@ -1,0 +1,17 @@
+---
+
+#################################################################################
+# Common Packages - i.e. chrome/vscode
+#################################################################################
+
+- hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Install vscode
+      win_chocolatey:
+        name:
+          - vscode
+        state: present
+    # TODO: Add support for installing extensions
