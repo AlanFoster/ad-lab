@@ -5,6 +5,7 @@
 #################################################################################
 
 - hosts: all
+  name: 'Install dev packages'
   become: false
   gather_facts: false
 
@@ -14,7 +15,7 @@
     #################################################################################
 
     - name: Install git
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name: git
         package_params:
           - /GitAndUnixToolsOnPath
@@ -26,13 +27,13 @@
     #################################################################################
 
     - name: Install python
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - python
         state: present
 
     - name: Install php
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - php
         state: present
@@ -42,27 +43,27 @@
     #################################################################################
 
     - name: Install procmon - Process monitoring for finding DLL path injections etc
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - procmon
         state: present
 
     - name: Install everything.exe - Fast alternative to using the default file explorer
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - everything
         state: present
 
     # Extract build number for powertools
     - name: Extract windows build number
-      win_shell: '[Environment]::OSVersion.Version.Build'
+      ansible.windows.win_shell: '[Environment]::OSVersion.Version.Build'
       register: win_build_number
       changed_when: false
 
     # Install powertools only if available on the target host
     - name: Install Powertools - for multiple quality of life improvements. Install skipped if win_build_number less than 17134
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - everything
         state: present
-      when: win_build_number|int >= 17134
+      when: (win_build_number | int) >= 17134

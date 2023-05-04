@@ -5,12 +5,13 @@
 #################################################################################
 
 - hosts: all
+  name: 'Install common packages'
   become: false
   gather_facts: false
 
   tasks:
     - name: Install vscode
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name:
           - vscode
         state: present

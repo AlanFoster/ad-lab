@@ -49,7 +49,8 @@ function Fetch-GitRepo([string]$gitPath, [string]$repo, [string]$dest) {
     $res = Run-Command -Command "`"$gitPath`" -C `"$dest`" fetch --all"
     $module.Result.rc = $res.rc
     $module.Result.git_output = $res
-    $module.Result.Changed = $true
+    # Console output suggests a change
+    $module.Result.changed = -Not [String]::IsNullOrEmpty($res.stdout)
 }
 
 $module.Result.values = @{}
