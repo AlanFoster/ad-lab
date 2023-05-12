@@ -1,0 +1,5 @@
+# Ignore all files by default
+*
+
+# Allow only ansible files to be copied to the docker build context
+!ansible

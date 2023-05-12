@@ -1,0 +1,3 @@
+collections:
+# https://galaxy.ansible.com/chocolatey/chocolatey
+- name: chocolatey.chocolatey

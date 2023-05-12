@@ -52,10 +52,18 @@ vagrant up --debug-timestamp --provider=virtualbox Kali WinDev
 
 ### Provisioning
 
-Ansible is currently used for provisioning:
+Ansible is currently used for provisioning.
+
+Create a docker environment for Ansible to run the provisioning scripts from:
 
 ```
-cd ansible
+docker-compose build
+docker-compose run ansible
+```
+
+Inside the container you can run Ansible commands:
+
+```
 time ANSIBLE_CONFIG=$(pwd) ansible-playbook -i inventory --limit Kali kali.yml
 time ANSIBLE_CONFIG=$(pwd) ansible-playbook -i inventory --limit WinDev windev.yml -vvv
 ```
