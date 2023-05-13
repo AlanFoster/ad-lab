@@ -38,6 +38,12 @@
           - php
         state: present
 
+    - name: Install openjdk
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - openjdk
+        state: present
+
     #################################################################################
     # Other Packages
     #################################################################################
