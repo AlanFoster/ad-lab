@@ -85,6 +85,17 @@ def with_common_software(vm_config)
   vm_config.vm.provision("shell", reboot: true)
 end
 
+def configure_private_ip(vm_config, ip:, netmask:)
+  vm_config.vm.network "private_network", ip: ip, netmask: netmask
+
+  # vmware requires an additional configuration step:
+  #   ==> WinDev: Configuring secondary network adapters through VMware
+  #   ==> WinDev: on Windows is not yet supported. You will need to manually
+  #   ==> WinDev: configure the network adapter.
+  # context: https://github.com/hashicorp/vagrant/issues/5000
+  vm_config.vm.provision("shell", path: "scripts/windows/fix-second-network.ps1", privileged: false, args: "#{ip} #{netmask}")
+end
+
 Vagrant.configure("2") do |config|
   # Disable vagrant-vbguest for faster setup times
   if Vagrant.has_plugin?("vagrant-vbguest")
@@ -107,7 +118,7 @@ Vagrant.configure("2") do |config|
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: machines.dc01.ip, netmask: machines.dc01.netmask
+    configure_private_ip(vm_config, ip: machines.dc01.ip, netmask: machines.dc01.netmask)
 
     vm_config.vm.provision(
       "shell",
@@ -148,7 +159,7 @@ Vagrant.configure("2") do |config|
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: machines.ws01.ip, netmask: machines.ws01.netmask
+    configure_private_ip(vm_config, ip: machines.ws01.ip, netmask: machines.ws01.netmask)
 
     vm_config.vm.provision(
       "shell",
@@ -176,7 +187,7 @@ Vagrant.configure("2") do |config|
     vm_config.winrm.basic_auth_only = true
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: machines.dc02.ip, netmask: machines.dc02.netmask
+    configure_private_ip(vm_config, ip: machines.dc02.ip, netmask: machines.dc02.netmask)
 
     vm_config.vm.provision(
       "shell",
@@ -195,7 +206,7 @@ Vagrant.configure("2") do |config|
     vm_config.vm.hostname = machines.kali.hostname
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: machines.kali.ip, netmask: machines.kali.netmask
+    configure_private_ip(vm_config, ip: machines.kali.ip, netmask: machines.kali.netmask)
   end
 
   config.vm.define("WinDev", autostart: false) do |vm_config|
@@ -204,15 +215,10 @@ Vagrant.configure("2") do |config|
     vm_config.vm.hostname = machines.windev.hostname
 
     # IP Accessible from the host machine
-    vm_config.vm.network "private_network", ip: machines.windev.ip, netmask: machines.windev.netmask
+    configure_private_ip(vm_config, ip: machines.windev.ip, netmask: machines.windev.netmask)
 
     vm_config.vm.provision("shell", path: "scripts/windows/ConfigureRemotingForAnsible.ps1")
     vm_config.vm.provision("shell", path: "scripts/windows/install-choco.ps1")
-    # XXX: vmware requires an additional configuration step:
-    # ==> WinDev: Configuring secondary network adapters through VMware
-    # ==> WinDev: on Windows is not yet supported. You will need to manually
-    # ==> WinDev: configure the network adapter.
-    # https://github.com/hashicorp/vagrant/issues/5000
   end
 
   config.vm.provider "vmware_desktop" do |v|
