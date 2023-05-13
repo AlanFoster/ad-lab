@@ -32,6 +32,43 @@ The following providers are supported:
 1. `virtualbox`
 2. `vmware_desktop`
 
+If you are on a Mac and running with vmware, you must first manually create the available network adapters:
+
+```bash
+# vmware library
+cd /Applications/VMware\ Fusion.app/Contents/Library
+
+# Config for 10.10.0.0/16 and 10.11.0.0/16
+config=(
+   "VNET_10_DHCP no"
+   "VNET_10_HOSTONLY_SUBNET 10.10.0.0"
+   "VNET_10_HOSTONLY_NETMASK 255.255.0.0"
+   "VNET_10_VIRTUAL_ADAPTER yes"
+
+   "VNET_11_DHCP no"
+   "VNET_11_HOSTONLY_SUBNET 10.11.0.0"
+   "VNET_11_HOSTONLY_NETMASK 255.255.0.0"
+   "VNET_11_VIRTUAL_ADAPTER yes"
+)
+
+for line in ${config[@]}; do
+   name=$(echo -n $line | cut -d' ' -f1)
+   value=$(echo -n $line | cut -d' ' -f2)
+   sudo ./vmnet-cfgcli vnetcfgadd "$name" "$value"
+done
+
+# Reset
+sudo ./vmnet-cli --configure
+sudo ./vmnet-cli --stop
+sudo ./vmnet-cli --start
+
+# If removal is required
+for line in ${config[@]}; do
+   name=$(echo -n $line | cut -d' ' -f1)
+   sudo ./vmnet-cfgcli vnetcfgremove $name
+done
+```
+
 Create a single domain controller:
 
 ```
