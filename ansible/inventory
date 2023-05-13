@@ -1,3 +1,27 @@
-Kali ansible_ssh_host=192.168.123.133 ansible_ssh_port=22 ansible_ssh_user='vagrant' ansible_ssh_password='vagrant'
-#WinDev ansible_connection=winrm ansible_winrm_host=192.168.253.156 ansible_winrm_port=5985 ansible_user='vagrant' ansible_password='vagrant' ansible_winrm_server_cert_validation='ignore'
-WinDev ansible_connection=ssh ansible_ssh_host=192.168.253.156 ansible_ssh_port=22 ansible_user='vagrant' ansible_password='vagrant' ansible_shell_type='cmd'
+[Linux]
+Kali ansible_host=10.10.10.10
+
+[Windows]
+WinDev ansible_host=10.10.10.11
+
+[all:vars]
+ansible_user='vagrant'
+ansible_password='vagrant'
+
+# ssh
+ansible_ssh_port=22
+
+# winrm
+ansible_winrm_scheme=http
+ansible_winrm_port=5985
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+
+# psrp
+ansible_psrp_cert_validation=ignore
+
+[Linux:vars]
+ansible_connection=ssh
+
+[Windows:vars]
+ansible_connection=psrp

@@ -5,7 +5,7 @@ WORKDIR /ansible
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get -qq install python3-pip curl sshpass
 
-RUN python3 -m pip install ansible
+RUN python3 -m pip install ansible pywinrm pypsrp
 
 COPY ./ansible/requirements.yml .
 RUN ansible-galaxy install -r requirements.yml
