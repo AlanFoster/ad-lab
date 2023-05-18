@@ -90,30 +90,26 @@
         elevated: true
         nobanner: true
         interactive: true
-        # wait: true
         timeout: 1800
       register: visual_studio_install_result
       when: not visual_studio_dev_env.stat.exists
 
-    # - name: Visual studio - wait_for_pid
-    #   community.windows.win_wait_for_process:
-    #     pid: '{{ visual_studio_install_result.pid }}'
-    #     timeout: 300
-    #   when: not visual_studio_dev_env.stat.exists
+    - name: Visual studio - reboot if reboot choco is 3010 exit code
+      ansible.windows.win_reboot: {}
+      when: visual_studio_install_result.rc | default(0) == 3010
 
-    #   register: visual_studio_install_result
-    #   # XXX: There are more exit codes from Chocolatey now that indicate success -0, 1605, 1614, 1641, and 3010.
-    #   # https://docs.chocolatey.org/en-us/choco/release-notes#breaking-changes-7
-    #   # 3010 indicates a restart is required
-    #   failed_when: "visual_studio_install_result.rc | default(0) not in [0, 3010]"
-    #   when: not visual_studio_dev_env.stat.exists
+    - name: Visual studio - Ensure WinRM starts when the system has settled and is ready to work reliably
+      ansible.windows.win_service:
+        name: WinRM
+        start_mode: delayed
+      when: visual_studio_install_result.rc | default(0) == 3010
 
-    # - name: Visual studio - reboot if reboot choco is 3010 exit code
-    #   ansible.windows.win_reboot: {}
-    #   when: visual_studio_install_result.rc | default(0) == 3010
+    #################################################################################
+    # Metasploit-payloads cloning and bundle
+    #################################################################################
 
-    # - name: Visual studio - Ensure WinRM starts when the system has settled and is ready to work reliably
-    #   ansible.windows.win_service:
-    #     name: WinRM
-    #     start_mode: delayed
-    #   when: visual_studio_install_result.rc | default(0) == 3010
+    - name: Metasploit Payloads - Clone
+      win_git:
+        repo: 'https://github.com/rapid7/metasploit-payloads'
+        dest: '{{ install_directory }}'
+      register: metasploit_payloads_clone
